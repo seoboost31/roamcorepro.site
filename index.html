@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoamCore Pro — Expedition & Trail Planning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Karla:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1F3229;
+    --sienna:#A8532E;
+    --sand:#E8DCC4;
+    --sky:#6E9887;
+    --ink:#1B1D18;
+    --line: rgba(27,29,24,0.15);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--sand);color:var(--ink);font-family:'Karla',sans-serif;overflow-x:hidden;}
+  a{color:inherit;text-decoration:none;}
+
+  /* topographic backdrop */
+  .topo-bg{
+    position:absolute;inset:0;opacity:0.08;pointer-events:none;
+    background-image:
+      repeating-radial-gradient(circle at 20% 30%, transparent 0, transparent 18px, var(--forest) 19px, transparent 20px),
+      repeating-radial-gradient(circle at 80% 70%, transparent 0, transparent 26px, var(--sienna) 27px, transparent 28px);
+  }
+
+  header{position:sticky;top:0;z-index:50;background:var(--sand);border-bottom:2px solid var(--ink);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;max-width:1200px;margin:0 auto;}
+  .logo{font-family:'Archivo Black',sans-serif;font-size:1.2rem;letter-spacing:-0.01em;text-transform:uppercase;}
+  .logo span{color:var(--sienna);}
+  .nav-links{display:flex;gap:30px;font-size:0.85rem;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;}
+  .nav-cta{background:var(--forest);color:var(--sand);padding:11px 22px;font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;}
+
+  /* HERO */
+  .hero{position:relative;padding:80px 32px 0;max-width:1200px;margin:0 auto;overflow:hidden;}
+  .hero-inner{position:relative;z-index:1;}
+  .hero-coords{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--forest);letter-spacing:0.05em;margin-bottom:20px;}
+  .hero h1{
+    font-family:'Archivo Black',sans-serif;text-transform:uppercase;font-size:clamp(2.6rem,8vw,6.2rem);
+    line-height:0.92;letter-spacing:-0.01em;max-width:900px;
+  }
+  .hero h1 .line2{color:var(--sienna);}
+  .hero p{margin:28px 0 0;font-size:1.08rem;line-height:1.6;max-width:480px;color:rgba(27,29,24,0.72);}
+  .hero-actions{margin-top:34px;display:flex;gap:16px;padding-bottom:60px;}
+  .btn-primary{background:var(--sienna);color:var(--sand);padding:16px 30px;font-weight:700;text-transform:uppercase;font-size:0.85rem;letter-spacing:0.03em;}
+  .btn-outline{border:2px solid var(--ink);padding:14px 28px;font-weight:700;text-transform:uppercase;font-size:0.85rem;letter-spacing:0.03em;}
+
+  /* STAT DIVIDER */
+  .stat-bar{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);display:grid;grid-template-columns:repeat(4,1fr);}
+  .stat{padding:28px 32px;border-right:1px solid var(--line);}
+  .stat:last-child{border-right:none;}
+  .stat .val{font-family:'Archivo Black',sans-serif;font-size:2rem;}
+  .stat .val.sienna{color:var(--sienna);}
+  .stat .label{font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;color:rgba(27,29,24,0.55);margin-top:4px;letter-spacing:0.04em;}
+
+  .section{padding:100px 32px;max-width:1200px;margin:0 auto;}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:56px;flex-wrap:wrap;}
+  .section-head h2{font-family:'Archivo Black',sans-serif;text-transform:uppercase;font-size:clamp(1.8rem,3.6vw,2.8rem);letter-spacing:-0.01em;}
+  .section-head p{max-width:360px;color:rgba(27,29,24,0.65);font-size:0.95rem;line-height:1.55;}
+
+  /* ROUTE - real sequence, numbered markers justified */
+  .route{position:relative;padding-left:40px;border-left:2px dashed var(--forest);}
+  .route-stop{position:relative;padding-bottom:48px;}
+  .route-stop:last-child{padding-bottom:0;}
+  .route-stop::before{
+    content:'';position:absolute;left:-49px;top:2px;width:16px;height:16px;background:var(--sienna);
+    border-radius:50%;border:3px solid var(--sand);
+  }
+  .route-day{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--sienna);text-transform:uppercase;letter-spacing:0.06em;}
+  .route-stop h3{font-family:'Archivo Black',sans-serif;font-size:1.5rem;text-transform:uppercase;margin:8px 0 8px;}
+  .route-stop p{font-size:0.94rem;line-height:1.6;color:rgba(27,29,24,0.7);max-width:600px;}
+
+  /* GEAR CARDS */
+  .gear-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--ink);}
+  .gear-card{background:var(--sand);padding:32px 24px;}
+  .gear-card .tag{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--sky);text-transform:uppercase;letter-spacing:0.05em;}
+  .gear-card h4{font-family:'Archivo Black',sans-serif;font-size:1.1rem;text-transform:uppercase;margin:12px 0 8px;}
+  .gear-card p{font-size:0.86rem;color:rgba(27,29,24,0.65);line-height:1.5;}
+
+  /* CTA band */
+  .cta-band{background:var(--forest);color:var(--sand);padding:100px 32px;text-align:center;}
+  .cta-band h2{font-family:'Archivo Black',sans-serif;text-transform:uppercase;font-size:clamp(2rem,4.6vw,3.4rem);max-width:800px;margin:0 auto;line-height:1.02;}
+  .cta-band h2 span{color:#D99568;}
+  .cta-band p{margin:22px auto 36px;max-width:480px;color:rgba(232,220,196,0.75);}
+  .cta-band .btn-primary{background:var(--sand);color:var(--forest);}
+
+  footer{padding:44px 32px;border-top:2px solid var(--ink);}
+  .footer-grid{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;align-items:center;}
+  .footer-links{display:flex;gap:26px;font-size:0.85rem;text-transform:uppercase;font-weight:600;letter-spacing:0.02em;}
+  .footer-copy{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:rgba(27,29,24,0.55);}
+
+  @media(max-width:900px){
+    .nav-links{display:none;}
+    .stat-bar{grid-template-columns:repeat(2,1fr);}
+    .stat{border-bottom:1px solid var(--line);}
+    .gear-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  :focus-visible{outline:2px solid var(--sienna);outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo">Roam<span>Core</span> Pro</div>
+    <div class="nav-links">
+      <a href="#route">Routes</a>
+      <a href="#gear">Gear</a>
+      <a href="#cta">Plan a Trip</a>
+    </div>
+    <a href="#cta" class="nav-cta">Plan your route</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="topo-bg"></div>
+  <div class="hero-inner">
+    <div class="hero-coords">46.8523° N, 121.7603° W — TRAILHEAD READY</div>
+    <h1>Plan the route.<br><span class="line2">Trust the trail.</span></h1>
+    <p>RoamCore Pro builds multi-day expedition routes with real elevation data, weather windows, and gear lists — so the only surprise out there is the view.</p>
+    <div class="hero-actions">
+      <a href="#cta" class="btn-primary">Start planning free</a>
+      <a href="#route" class="btn-outline">See a sample route</a>
+    </div>
+  </div>
+</section>
+
+<div class="stat-bar">
+  <div class="stat"><div class="val sienna">1,200+</div><div class="label">Routes mapped</div></div>
+  <div class="stat"><div class="val">38</div><div class="label">Countries covered</div></div>
+  <div class="stat"><div class="val sienna">96%</div><div class="label">Trip completion rate</div></div>
+  <div class="stat"><div class="val">4.7★</div><div class="label">Avg trail rating</div></div>
+</div>
+
+<section class="section" id="route">
+  <div class="section-head">
+    <h2>Sample route: Ridgeline Traverse</h2>
+    <p>A 4-day, 52km alpine route — built by RoamCore's planner in under ten minutes.</p>
+  </div>
+  <div class="route">
+    <div class="route-stop">
+      <div class="route-day">Day 1 · 14km</div>
+      <h3>Trailhead to Cedar Basin</h3>
+      <p>Gentle switchbacks through old-growth forest, gaining 620m. Water source at the 9km mark — last reliable refill before camp.</p>
+    </div>
+    <div class="route-stop">
+      <div class="route-day">Day 2 · 17km</div>
+      <h3>Cedar Basin to High Saddle</h3>
+      <p>The big climb — 900m of exposed ridge with wide views. Weather window matters most here; check the morning forecast alert.</p>
+    </div>
+    <div class="route-stop">
+      <div class="route-day">Day 3 · 12km</div>
+      <h3>High Saddle to Marmot Lake</h3>
+      <p>Mostly descent, easing into alpine meadow. Popular campsite — RoamCore shows real-time occupancy so you're not turned away.</p>
+    </div>
+    <div class="route-stop">
+      <div class="route-day">Day 4 · 9km</div>
+      <h3>Marmot Lake to Trailhead</h3>
+      <p>Easy out, mostly downhill. Shuttle pickup point and timing suggestions included in your route pack.</p>
+    </div>
+  </div>
+</section>
+
+<section id="gear">
+  <div class="section" style="padding-bottom:0;">
+    <div class="section-head">
+      <h2>Auto-built gear list</h2>
+      <p>Generated from your route's elevation, season, and forecast — not a generic packing checklist.</p>
+    </div>
+  </div>
+  <div class="gear-grid">
+    <div class="gear-card">
+      <div class="tag">Shelter</div>
+      <h4>3-season tent</h4>
+      <p>Flagged for this route's overnight lows and expected wind exposure on Day 2's ridge.</p>
+    </div>
+    <div class="gear-card">
+      <div class="tag">Water</div>
+      <h4>2L capacity + filter</h4>
+      <p>Sized against the route's confirmed water sources and the 17km dry stretch on Day 2.</p>
+    </div>
+    <div class="gear-card">
+      <div class="tag">Navigation</div>
+      <h4>Offline route file</h4>
+      <p>Downloaded to your device automatically — full route works with zero signal.</p>
+    </div>
+    <div class="gear-card">
+      <div class="tag">Safety</div>
+      <h4>Weather alert pack</h4>
+      <p>Push alerts tied to your exact route coordinates, not the nearest town's forecast.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band" id="cta">
+  <h2>Your next route is <span>ten minutes away.</span></h2>
+  <p>Enter a start point and a number of days — RoamCore handles elevation, water, and weather.</p>
+  <a href="mailto:hello@roamcorepro.site" class="btn-primary">Start planning free</a>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="logo">Roam<span>Core</span> Pro</div>
+    <div class="footer-links">
+      <a href="#route">Routes</a>
+      <a href="#gear">Gear</a>
+      <a href="#cta">Plan a Trip</a>
+    </div>
+    <div class="footer-copy">© 2026 ROAMCORE PRO</div>
+  </div>
+</footer>
+
+</body>
+</html>
